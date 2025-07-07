@@ -8,10 +8,12 @@ let products = [
 ];
 let nextId = 4;
 
+// GET /api/products
 router.get('/', (req, res) => {
     res.status(200).json(products);
 });
 
+// GET /api/products/:pid
 router.get('/:pid', (req, res) => {
     const id = parseInt(req.params.pid);
     const product = products.find(p => p.id === id);
@@ -21,6 +23,7 @@ router.get('/:pid', (req, res) => {
     res.json(product);
 });
 
+// POST /api/products
 router.post('/', (req, res) => {
     const { nombre, Precio } = req.body;
     if (!nombre || !Precio) {
