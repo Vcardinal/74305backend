@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Torta chocolate", "Precio": 1500 },
+  { "id": 2, "nombre": "Cupcakes", "Precio": 900 },
+  { "id": 3, "nombre": "Mini Pastelería", "Precio": 1500 }
+]

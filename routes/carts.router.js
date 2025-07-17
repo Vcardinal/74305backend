@@ -1,23 +1,17 @@
 const express = require('express');
 const router = express.Router();
-
-let carts = [];
-let nextCartId = 1;
+const CartManager = require('../managers/cart.manager');
 
 // POST /api/carts
-router.post('/', (req, res) => {
-    const nuevoCarrito = {
-        id: nextCartId++,
-        products: []
-    };
-    carts.push(nuevoCarrito);
+router.post('/', async (req, res) => {
+    const nuevoCarrito = await CartManager.createCart();
     res.status(201).json(nuevoCarrito);
 });
 
 // GET /api/carts/:cid
-router.get('/:cid', (req, res) => {
+router.get('/:cid', async (req, res) => {
     const cid = parseInt(req.params.cid);
-    const carrito = carts.find(c => c.id === cid);
+    const carrito = await CartManager.getById(cid);
     if (!carrito) {
         return res.status(404).json({ mensaje: "Carrito no encontrado" });
     }
@@ -25,20 +19,13 @@ router.get('/:cid', (req, res) => {
 });
 
 // POST /api/carts/:cid/product/:pid
-router.post('/:cid/product/:pid', (req, res) => {
+router.post('/:cid/product/:pid', async (req, res) => {
     const cid = parseInt(req.params.cid);
     const pid = parseInt(req.params.pid);
 
-    const carrito = carts.find(c => c.id === cid);
+    const carrito = await CartManager.addProductToCart(cid, pid);
     if (!carrito) {
         return res.status(404).json({ mensaje: "Carrito no encontrado" });
-    }
-
-    const productoEnCarrito = carrito.products.find(p => p.product === pid);
-    if (productoEnCarrito) {
-        productoEnCarrito.quantity += 1;
-    } else {
-        carrito.products.push({ product: pid, quantity: 1 });
     }
 
     res.status(200).json({ mensaje: "Producto agregado al carrito", carrito });
