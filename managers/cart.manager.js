@@ -1,6 +1,5 @@
 const fs = require('fs').promises;
 const path = require('path');
-const productsPath = path.join(__dirname, '../data/products.json'); 
 
 const cartsPath = path.join(__dirname, '../data/carts.json');
 
@@ -29,17 +28,7 @@ class CartManager {
     async addProductToCart(cid, pid) {
         const carts = await this.getAll();
         const cart = carts.find(c => c.id === cid);
-        if (!cart) {
-            throw new Error('Carrito no encontrado');
-        }
-
-        //  Validaciones solicitadas un ejemplo , existe el producto real?
-        const productData = await fs.readFile(productsPath, 'utf-8');
-        const products = JSON.parse(productData);
-        const productExists = products.find(p => p.id === pid);
-        if (!productExists) {
-            throw new Error('Producto no encontrado');
-        }
+        if (!cart) return null;
 
         const existingProduct = cart.products.find(p => p.product === pid);
         if (existingProduct) {
@@ -51,7 +40,21 @@ class CartManager {
         await fs.writeFile(cartsPath, JSON.stringify(carts, null, 2));
         return cart;
     }
+
+    async removeProductFromCart(cid, pid) {
+        const carts = await this.getAll();
+        const cart = carts.find(c => c.id === cid);
+        if (!cart) return null;
+
+        const productoExiste = cart.products.find(p => p.product === pid);
+        if (!productoExiste) return null;
+
+        cart.products = cart.products.filter(p => p.product !== pid);
+        await fs.writeFile(cartsPath, JSON.stringify(carts, null, 2));
+        return cart;
+    }
 }
 
 module.exports = new CartManager();
+
 

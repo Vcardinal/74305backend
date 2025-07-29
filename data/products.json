@@ -18,5 +18,15 @@
     "id": 4,
     "nombre": "Brownies",
     "precio": 600
+  },
+  {
+    "id": 5,
+    "nombre": "alfajores",
+    "precio": 100
+  },
+  {
+    "id": 6,
+    "nombre": "cookies vainilla",
+    "precio": 100
   }
 ]
