@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Productos Delicakes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #ffe4ec, #e6f6ff);
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    h1 {
+      color: #c75287;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .list-group-item {
+      background-color: #fff;
+      border: 1px solid #e3c7dd;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧁 Lista de productos</h1>
+
+  <div class="container">
+    {{#if products.length}}
+      <ul class="list-group">
+        {{#each products}}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><strong>{{nombre}}</strong></span>
+            <span>$ {{precio}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p class="text-center">No hay productos disponibles aún.</p>
+    {{/if}}
+
+    <div class="text-center mt-4">
+      <a href="/cartview" class="btn btn-primary">
+        Ver carrito 🛒
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
+
+

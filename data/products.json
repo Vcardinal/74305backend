@@ -1,5 +1,22 @@
 [
-  { "id": 1, "nombre": "Torta chocolate", "Precio": 1500 },
-  { "id": 2, "nombre": "Cupcakes", "Precio": 900 },
-  { "id": 3, "nombre": "Mini Pastelería", "Precio": 1500 }
+  {
+    "id": 1,
+    "nombre": "Torta de chocolate",
+    "precio": 1200
+  },
+  {
+    "id": 2,
+    "nombre": "Cupcakes decorados",
+    "precio": 800
+  },
+  {
+    "id": 3,
+    "nombre": "Mini torta frutal",
+    "precio": 950
+  },
+  {
+    "id": 4,
+    "nombre": "Brownies",
+    "precio": 600
+  }
 ]
