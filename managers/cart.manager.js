@@ -1,60 +1,89 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { CartModel } from '../models/Cart.model.js';
 
-const cartsPath = path.join(__dirname, '../data/carts.json');
+export default class CartManager {
+  async getAll() {
+    return await CartModel.find();
+  }
 
-class CartManager {
-    async getAll() {
-        const data = await fs.readFile(cartsPath, 'utf-8');
-        return JSON.parse(data);
+  async getById(cid) {
+    return await CartModel.findById(cid).populate('products.product').lean();
+  }
+
+  async createCart() {
+    const newCart = await CartModel.create({ products: [] });
+    return newCart;
+  }
+
+  async addProductToCart(cid, pid) {
+    const cart = await CartModel.findById(cid);
+    if (!cart) throw new Error('Carrito no encontrado');
+
+    const existingProduct = cart.products.find(p => p.product.toString() === pid.toString());
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+    } else {
+      cart.products.push({ product: pid, quantity: 1 });
     }
 
-    async getById(id) {
-        const carts = await this.getAll();
-        return carts.find(c => c.id === id);
-    }
+    await cart.save();
+    return cart;
+  }
 
-    async createCart() {
-        const carts = await this.getAll();
-        const newCart = {
-            id: carts.length ? carts[carts.length - 1].id + 1 : 1,
-            products: []
-        };
-        carts.push(newCart);
-        await fs.writeFile(cartsPath, JSON.stringify(carts, null, 2));
-        return newCart;
-    }
+  async removeProductFromCart(cid, pid) {
+    const cart = await CartModel.findById(cid);
+    if (!cart) throw new Error('Carrito no encontrado');
 
-    async addProductToCart(cid, pid) {
-        const carts = await this.getAll();
-        const cart = carts.find(c => c.id === cid);
-        if (!cart) return null;
+    const index = cart.products.findIndex(p => p.product.toString() === pid.toString());
+    if (index === -1) throw new Error('Producto no encontrado en el carrito');
 
-        const existingProduct = cart.products.find(p => p.product === pid);
-        if (existingProduct) {
-            existingProduct.quantity += 1;
-        } else {
-            cart.products.push({ product: pid, quantity: 1 });
-        }
+    cart.products.splice(index, 1);
+    await cart.save();
+    return cart;
+  }
 
-        await fs.writeFile(cartsPath, JSON.stringify(carts, null, 2));
-        return cart;
-    }
+  async emptyCart(cid) {
+    const cart = await CartModel.findById(cid);
+    if (!cart) throw new Error('Carrito no encontrado');
 
-    async removeProductFromCart(cid, pid) {
-        const carts = await this.getAll();
-        const cart = carts.find(c => c.id === cid);
-        if (!cart) return null;
+    cart.products = [];
+    await cart.save();
+    return cart;
+  }
 
-        const productoExiste = cart.products.find(p => p.product === pid);
-        if (!productoExiste) return null;
+  async updateProductQuantity(cid, pid, quantity) {
+    const cart = await CartModel.findById(cid);
+    if (!cart) throw new Error('Carrito no encontrado');
 
-        cart.products = cart.products.filter(p => p.product !== pid);
-        await fs.writeFile(cartsPath, JSON.stringify(carts, null, 2));
-        return cart;
-    }
+    const product = cart.products.find(p => p.product.toString() === pid);
+    if (!product) throw new Error('Producto no encontrado en el carrito');
+
+    product.quantity = quantity;
+    await cart.save();
+    return cart;
+  }
+
+  async deleteCart(cid) {
+    const result = await CartModel.findByIdAndDelete(cid);
+    if (!result) throw new Error('Carrito no encontrado');
+    return result;
+  }
+
+  async getCartResumen(cid) {
+    const cart = await CartModel.findById(cid).populate('products.product');
+    if (!cart) throw new Error('Carrito no encontrado');
+
+    const productos = cart.products.map(p => ({
+      id: p.product._id,
+      nombre: p.product.nombre,
+      precio: p.product.precio,
+      cantidad: p.quantity,
+      subtotal: p.product.precio * p.quantity
+    }));
+
+    const total = productos.reduce((acc, p) => acc + p.subtotal, 0);
+
+    return { productos, total };
+  }
 }
-
-module.exports = new CartManager();
 
 
